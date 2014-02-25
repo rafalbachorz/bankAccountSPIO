@@ -136,7 +136,7 @@ class Bank:
         else:
             additionalCharge = 1.01
 
-        finalAmount = additionalCharge*(1+bankLoan.getLoanAmount()*float(monthsElapsed)*bankLoan.getLoanRate()/1200.0)
+        finalAmount = bankLoan.getLoanAmount()* ( additionalCharge*float(monthsElapsed)*bankLoan.getLoanRate()/1200.0 + 1.0)
         success = bankLoan._RORaccount.withdraw(finalAmount)
         if (not success):
             bankLoan._RORaccount.setDebit(True)
@@ -169,7 +169,6 @@ ZygaKonto.writeInfo()
 ZygaLoan = allAccounts1.createBankLoan(ZygaKonto, 200, 12, 6)
 ZygaKonto.writeInfo()
 allAccounts1.removeBankLoan(ZygaLoan,12)
-ZygaKonto.writeInfo()
 ZygaKonto.writeInfo()
 #print allAccounts1.getNumberOfAccounts()
 #Acc1=bankAccountROR("Rafal Bachorz 1", 12345678, allAccounts1, 50000, False)
