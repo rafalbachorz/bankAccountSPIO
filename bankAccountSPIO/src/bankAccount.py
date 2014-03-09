@@ -6,7 +6,23 @@ Created on Feb 25, 2014
 class bankAccountGeneral:
     def __init__(self, name, accountNumber):
         self._name, self._number = name, accountNumber    
+   
+class bankAccountRORstate(bankAccountGeneral):
+    def __init__(self, name, accountNumber, initialAmount, debitFlag):
+        bankAccountGeneral.__init__(self, name, accountNumber)
+        self._balance = initialAmount
+        self._debit = debitFlag
+        self._history = []
+        self._interestRate = interestRate2()
         
+    def getNewAmount(self):
+        newAmount = self._interestRate.getNewSaldo(self._balance)
+        print 'newAmount %s' % newAmount 
+        return(newAmount)
+    
+    def setNewInterestRate(self, newInterestRate):
+        self._interestRate = newInterestRate
+                
 class bankAccountROR(bankAccountGeneral):
     def __init__(self, name, accountNumber, initialAmount, debitFlag):
         bankAccountGeneral.__init__(self, name, accountNumber)
@@ -103,6 +119,17 @@ class Bank:
         #if (not taken):
         #    self._allAccounts._allAccounts.append(accountNumber)
         Acc = bankAccountROR(name, 12345678, initialAmount, debitFlag)
+        
+        return(Acc)
+
+
+    def createRORaccountaState(self, name, initialAmount, debitFlag):
+        #append only unique number
+        #taken = self._allAccounts.checkAccount(self._number)
+        #if (not taken):
+        #    self._allAccounts._allAccounts.append(accountNumber)
+        Acc = bankAccountRORstate(name, 12345678, initialAmount, debitFlag)
+        
         return(Acc)
 
     def createBankDeposit(self, RORaccount, depositAmount, timeWindow, interestRate):
@@ -144,32 +171,58 @@ class Bank:
             
         del(bankLoan)    
 
+#
+# State pattern design
+#
+class interestRate:
+        
+    def getNewSaldo(self, amount):
+        return(amount*(1.0+self._rate/float(100.0)))
+        
+class interestRate1(interestRate):
+    def __init__(self):
+        self._rate = 5.0
+        
+class interestRate2(interestRate):
+    def __init__(self):
+        self._rate = 10.0
+        
+        
+        
+
+
 allAccounts1=Bank()
-Acc1 = allAccounts1.createRORaccount("Rafal Bachorz 1", 40000, False)
-Acc2 = allAccounts1.createRORaccount("Rafal Bachorz 2", 30000, False)
-Acc1.writeInfo()
-Acc2.writeInfo()
-Acc1.setDebit(True)
+#Acc1 = allAccounts1.createRORaccount("Rafal Bachorz 1", 40000, False)
+#Acc2 = allAccounts1.createRORaccount("Rafal Bachorz 2", 30000, False)
+#Acc1.writeInfo()
+#Acc2.writeInfo()
+#Acc1.setDebit(True)
 #success = Acc1.withdraw(100000)
 #print success
-Acc1.writeInfo()
+#Acc1.writeInfo()
 
-Acc3 = allAccounts1.createBankDeposit(Acc1, 4000, 12, 6)
-Acc3.writeInfo()
-Acc1.writeInfo()
-allAccounts1.removeBankDeposit(Acc3, 12)
-Acc1.writeInfo()
-Acc3 = allAccounts1.createBankLoan(Acc1, 200, 12, 6)
-Acc1.writeInfo()
-allAccounts1.removeBankLoan(Acc3, 12)
-Acc1.writeInfo()
+#Acc3 = allAccounts1.createBankDeposit(Acc1, 4000, 12, 6)
+#Acc3.writeInfo()
+#Acc1.writeInfo()
+#allAccounts1.removeBankDeposit(Acc3, 12)
+#Acc1.writeInfo()
+#Acc3 = allAccounts1.createBankLoan(Acc1, 200, 12, 6)
+#Acc1.writeInfo()
+#allAccounts1.removeBankLoan(Acc3, 12)
+#Acc1.writeInfo()
 
-ZygaKonto = allAccounts1.createRORaccount("Zygmunt Solorz", 220, False)
-ZygaKonto.writeInfo()
-ZygaLoan = allAccounts1.createBankLoan(ZygaKonto, 200, 12, 6)
-ZygaKonto.writeInfo()
-allAccounts1.removeBankLoan(ZygaLoan,12)
-ZygaKonto.writeInfo()
+#ZygaKonto = allAccounts1.createRORaccount("Zygmunt Solorz", 220, False)
+#ZygaKonto.writeInfo()
+#ZygaLoan = allAccounts1.createBankLoan(ZygaKonto, 200, 12, 6)
+#ZygaKonto.writeInfo()
+#allAccounts1.removeBankLoan(ZygaLoan,12)
+#ZygaKonto.writeInfo()
+
+
+ZygmuntKonto = allAccounts1.createRORaccountaState("Zygmunt Solorz", 220, False)
+ZygmuntKonto.getNewAmount()
+
+
 #print allAccounts1.getNumberOfAccounts()
 #Acc1=bankAccountROR("Rafal Bachorz 1", 12345678, allAccounts1, 50000, False)
 #Acc2=bankAccountROR("Rafal Bachorz 2", 12345679, allAccounts1, 50000, False)
