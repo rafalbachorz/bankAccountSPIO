@@ -8,10 +8,9 @@ class bankAccountGeneral:
         self._name, self._number = name, accountNumber    
    
 class bankAccountROR(bankAccountGeneral):
-    def __init__(self, name, accountNumber, initialAmount, debitFlag):
+    def __init__(self, name, accountNumber, initialAmount):
         bankAccountGeneral.__init__(self, name, accountNumber)
         self._balance = initialAmount
-        self._debit = debitFlag
         self._history = []
         self._interestRate = interestRate2()
         
@@ -33,20 +32,13 @@ class bankAccountROR(bankAccountGeneral):
         if (amount <= self._balance):
             self._balance -= amount
             success = True
-        else:
-            if (self._debit):
-                self._balance -= amount
-                success = True
-                
-        strAdd = 'operation: withdraw, amount %s, balance: %s' % (amount, self._balance)
-        self._history.append(strAdd)
+            strAdd = 'operation: withdraw, amount %s, balance: %s' % (amount, self._balance)
+            self._history.append(strAdd)
+            
         return(success)      
-                
-    def setDebit(self, yesOrNo):
-        self._debit = yesOrNo
         
     def writeInfo(self):
-        strPrt = 'RORaccount: %s, %s, balance: %s, debitPossible? %s' % (self._name, self._number, self._balance, self._debit)
+        strPrt = 'RORaccount: %s, %s, balance: %s, no debitPossible' % (self._name, self._number, self._balance)
         print strPrt
 
     def getHistory(self):
@@ -106,12 +98,12 @@ class Bank:
                 taken = True
         return(taken)        
     
-    def createRORaccount(self, name, initialAmount, debitFlag):
+    def createRORaccount(self, name, initialAmount):
         #append only unique number
         #taken = self._allAccounts.checkAccount(self._number)
         #if (not taken):
         #    self._allAccounts._allAccounts.append(accountNumber)
-        Acc = bankAccountROR(name, 12345678, initialAmount, debitFlag)
+        Acc = bankAccountROR(name, 12345678, initialAmount)
         
         return(Acc)
 
@@ -178,7 +170,8 @@ class debitWrapper:
         self._currDebit = 0
         
     def writeInfo(self):
-        self._RORaccount.writeInfo()
+        strPrt = 'RORaccount: %s, %s, balance: %s, allowedDebit? %s' % (self._RORaccount._name, self._RORaccount._number, self._RORaccount._balance, self._maxDebit)
+        print strPrt
 
     def deposit(self, amount):
         if (self._currDebit > 0):
@@ -190,6 +183,28 @@ class debitWrapper:
                 self._RORaccount.deposit(tmp)
         else:
             self._RORaccount.deposit(amount)
+            
+    def withdraw(self, amount):
+        success = False
+        if (self._currDebit > 0):
+            tmp = self._currDebit - amount
+            if (tmp <= self._maxDebit):
+                self._currDebit = tmp
+                success = True
+        else:
+            tmp = self._RORaccount._balance - amount
+            if (tmp >= 0):
+                self._RORaccount.withdraw(amount)
+                success = True
+            else:
+                if (tmp <= self._maxDebit):
+                    self._RORaccount.withdraw(self._RORaccount._balance)
+                    self._currDebit = -tmp
+                    success = True
+                else:
+                    success = False
+                
+        return(success)
                 
 #    def getCurrDebit(self):
 
@@ -204,16 +219,19 @@ allAccounts1=Bank()
 #print success
 #Acc1.writeInfo()
 
-ROR1 = allAccounts1.createRORaccount("Rafal Bachorz 1", 40000, False)
-ROR1.writeInfo()
+ROR1 = allAccounts1.createRORaccount("Rafal Bachorz 1", 40000)
+#ROR1.writeInfo()
 DEP1 = allAccounts1.createBankDeposit(ROR1, 4000, 12, 6)
 allAccounts1.removeBankDeposit(DEP1, 12)
+ROR1.writeInfo()
+ROR1.withdraw(10)
 ROR1.writeInfo()
 
 ROR1debit = debitWrapper(ROR1, 1000)
 ROR1debit.writeInfo()
 ROR1debit.deposit(20)
 ROR1debit.writeInfo()
+ROR1debit.withdraw(20)
 #Acc3.writeInfo()
 #Acc1.writeInfo()
 #allAccounts1.removeBankDeposit(Acc3, 12)
