@@ -22,13 +22,6 @@ class bankAccountRORstate(bankAccountGeneral):
     
     def setNewInterestRate(self, newInterestRate):
         self._interestRate = newInterestRate
-                
-class bankAccountROR(bankAccountGeneral):
-    def __init__(self, name, accountNumber, initialAmount, debitFlag):
-        bankAccountGeneral.__init__(self, name, accountNumber)
-        self._balance = initialAmount
-        self._debit = debitFlag
-        self._history = []
         
     def deposit(self, amount):
         self._balance += amount
@@ -47,7 +40,7 @@ class bankAccountROR(bankAccountGeneral):
                 
         strAdd = 'operation: withdraw, amount %s, balance: %s' % (amount, self._balance)
         self._history.append(strAdd)
-        return(success)
+        return(success)      
                 
     def setDebit(self, yesOrNo):
         self._debit = yesOrNo
@@ -60,6 +53,8 @@ class bankAccountROR(bankAccountGeneral):
         print "Number of entries: %s" % (len(self._history))
         for iii in range(len(self._history)):
             print self._history[iii]
+            
+
 
 class bankDeposit(bankAccountGeneral):
     def __init__(self, RORaccount, initialAmount, timeWindow, interestRate):
@@ -123,7 +118,7 @@ class Bank:
         return(Acc)
 
 
-    def createRORaccountaState(self, name, initialAmount, debitFlag):
+    def createRORaccountState(self, name, initialAmount, debitFlag):
         #append only unique number
         #taken = self._allAccounts.checkAccount(self._number)
         #if (not taken):
@@ -201,7 +196,11 @@ allAccounts1=Bank()
 #print success
 #Acc1.writeInfo()
 
-#Acc3 = allAccounts1.createBankDeposit(Acc1, 4000, 12, 6)
+ROR1 = allAccounts1.createRORaccountState("Rafal Bachorz 1", 40000, False)
+ROR1.writeInfo()
+DEP1 = allAccounts1.createBankDeposit(ROR1, 4000, 12, 6)
+allAccounts1.removeBankDeposit(DEP1, 12)
+ROR1.writeInfo()
 #Acc3.writeInfo()
 #Acc1.writeInfo()
 #allAccounts1.removeBankDeposit(Acc3, 12)
@@ -211,7 +210,7 @@ allAccounts1=Bank()
 #allAccounts1.removeBankLoan(Acc3, 12)
 #Acc1.writeInfo()
 
-#ZygaKonto = allAccounts1.createRORaccount("Zygmunt Solorz", 220, False)
+#ZygaKonto = allAccounts1.createRORaccountState("Zygmunt Solorz", 220, False)
 #ZygaKonto.writeInfo()
 #ZygaLoan = allAccounts1.createBankLoan(ZygaKonto, 200, 12, 6)
 #ZygaKonto.writeInfo()
@@ -219,8 +218,11 @@ allAccounts1=Bank()
 #ZygaKonto.writeInfo()
 
 
-ZygmuntKonto = allAccounts1.createRORaccountaState("Zygmunt Solorz", 220, False)
-ZygmuntKonto.getNewAmount()
+#ZygmuntKonto = allAccounts1.createRORaccountState("Zygmunt Solorz", 220, False)
+#ZygmuntKonto.writeInfo()
+#ZygmuntKonto.deposit(30)
+#ZygmuntKonto.writeInfo()
+#ZygmuntKonto.getNewAmount()
 
 
 #print allAccounts1.getNumberOfAccounts()
