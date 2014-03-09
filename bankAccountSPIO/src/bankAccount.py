@@ -7,7 +7,7 @@ class bankAccountGeneral:
     def __init__(self, name, accountNumber):
         self._name, self._number = name, accountNumber    
    
-class bankAccountRORstate(bankAccountGeneral):
+class bankAccountROR(bankAccountGeneral):
     def __init__(self, name, accountNumber, initialAmount, debitFlag):
         bankAccountGeneral.__init__(self, name, accountNumber)
         self._balance = initialAmount
@@ -53,8 +53,6 @@ class bankAccountRORstate(bankAccountGeneral):
         print "Number of entries: %s" % (len(self._history))
         for iii in range(len(self._history)):
             print self._history[iii]
-            
-
 
 class bankDeposit(bankAccountGeneral):
     def __init__(self, RORaccount, initialAmount, timeWindow, interestRate):
@@ -117,16 +115,6 @@ class Bank:
         
         return(Acc)
 
-
-    def createRORaccountState(self, name, initialAmount, debitFlag):
-        #append only unique number
-        #taken = self._allAccounts.checkAccount(self._number)
-        #if (not taken):
-        #    self._allAccounts._allAccounts.append(accountNumber)
-        Acc = bankAccountRORstate(name, 12345678, initialAmount, debitFlag)
-        
-        return(Acc)
-
     def createBankDeposit(self, RORaccount, depositAmount, timeWindow, interestRate):
         success = RORaccount.withdraw(depositAmount)
         if (success):
@@ -183,7 +171,27 @@ class interestRate2(interestRate):
         self._rate = 10.0
         
         
+class debitWrapper:
+    def __init__(self, RORaccount, maxDebit):
+        self._RORaccount = RORaccount
+        self._maxDebit = maxDebit
+        self._currDebit = 0
         
+    def writeInfo(self):
+        self._RORaccount.writeInfo()
+
+    def deposit(self, amount):
+        if (self._currDebit > 0):
+            tmp = self._currDebit - amount
+            if (tmp > 0):
+                self._currDebit = tmp
+            else:
+                self._currDebit = 0
+                self._RORaccount.deposit(tmp)
+        else:
+            self._RORaccount.deposit(amount)
+                
+#    def getCurrDebit(self):
 
 
 allAccounts1=Bank()
@@ -196,11 +204,16 @@ allAccounts1=Bank()
 #print success
 #Acc1.writeInfo()
 
-ROR1 = allAccounts1.createRORaccountState("Rafal Bachorz 1", 40000, False)
+ROR1 = allAccounts1.createRORaccount("Rafal Bachorz 1", 40000, False)
 ROR1.writeInfo()
 DEP1 = allAccounts1.createBankDeposit(ROR1, 4000, 12, 6)
 allAccounts1.removeBankDeposit(DEP1, 12)
 ROR1.writeInfo()
+
+ROR1debit = debitWrapper(ROR1, 1000)
+ROR1debit.writeInfo()
+ROR1debit.deposit(20)
+ROR1debit.writeInfo()
 #Acc3.writeInfo()
 #Acc1.writeInfo()
 #allAccounts1.removeBankDeposit(Acc3, 12)
@@ -210,7 +223,7 @@ ROR1.writeInfo()
 #allAccounts1.removeBankLoan(Acc3, 12)
 #Acc1.writeInfo()
 
-#ZygaKonto = allAccounts1.createRORaccountState("Zygmunt Solorz", 220, False)
+#ZygaKonto = allAccounts1.createRORaccount("Zygmunt Solorz", 220, False)
 #ZygaKonto.writeInfo()
 #ZygaLoan = allAccounts1.createBankLoan(ZygaKonto, 200, 12, 6)
 #ZygaKonto.writeInfo()
@@ -218,7 +231,7 @@ ROR1.writeInfo()
 #ZygaKonto.writeInfo()
 
 
-#ZygmuntKonto = allAccounts1.createRORaccountState("Zygmunt Solorz", 220, False)
+#ZygmuntKonto = allAccounts1.createRORaccount("Zygmunt Solorz", 220, False)
 #ZygmuntKonto.writeInfo()
 #ZygmuntKonto.deposit(30)
 #ZygmuntKonto.writeInfo()
